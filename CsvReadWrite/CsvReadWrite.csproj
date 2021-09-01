@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharBuffer.cs" />
+    <Compile Include="CsvStreamWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="CsvStreamReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
