@@ -78,7 +78,7 @@ namespace CsvReadWrite
 			{
 				string v = fields[i];
 
-				if (isFullQualify || (v ?? "").IndexOf(this.strColumnDelimiter)>=0 || (v ?? "").IndexOf(this.strRowDelimiter)>=0) 
+				if (isFullQualify || (v ?? "").IndexOf(this.strColumnDelimiter)>=0 || (v ?? "").IndexOf(this.strRowDelimiter)>=0 || (v ?? "").IndexOf("\r")>=0 || (v ?? "").IndexOf("\n") >= 0)
 				{
 					csv.Write(this.strQualifier);
 				}
