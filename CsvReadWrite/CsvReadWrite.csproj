@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{AF4B0661-4699-4BFB-980E-436B2D6ECDC4}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>CsvReader</RootNamespace>
-    <AssemblyName>CsvReader</AssemblyName>
+    <RootNamespace>CsvReadWrite</RootNamespace>
+    <AssemblyName>CsvReadWrite</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

@@ -1,5 +1,5 @@
-# CsvReader
-### a simple csv read library, support multiple character Row Delimiter and auto fit different line change marks.
+# CsvReadWrite
+### a simple csv read/write library, support multiple character Row Delimiter and auto fit different line change marks.
 * support multiple character Row Delimiter and auto fit different line change marks.
 * support multiple character Column Delimiter.
 * support multiple character Text Qualifier.
