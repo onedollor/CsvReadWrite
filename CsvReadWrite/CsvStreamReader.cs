@@ -44,9 +44,17 @@ namespace CsvReadWrite
 		/// </summary>
 		public bool TrimFields { get; set; } = true;
 
-		List<string> fields = new List<string>();
+		public int TrailerFieldCount { get; set; } = 0;
 
-		public CsvStreamReader(string csvFileAbsolutePath, string columnDelimiter, string rowDelimiter, string qualifier, string encoding, bool isRowDelimiterAcceptDifferentLineChangeCharacter, bool isColumnCountFromFirstRow)
+		List<string> fields = new List<string>();
+		List<string> trailerFields = new List<string>();
+
+		public List<string> TrailerFields 
+		{ 
+			get { return this.trailerFields; }
+		}
+
+		public CsvStreamReader(string csvFileAbsolutePath, string columnDelimiter, string rowDelimiter, string qualifier, string encoding, bool isRowDelimiterAcceptDifferentLineChangeCharacter, bool isColumnCountFromFirstRow, int trailerFieldCount)
 		{
 			CsvFileAbsolutePath = csvFileAbsolutePath;
 			if ((CsvFileAbsolutePath ?? "").Length == 0)
@@ -124,6 +132,8 @@ namespace CsvReadWrite
 			this.rowCount = 0;
 
 			this.CsvLength = new FileInfo(this.CsvFileAbsolutePath).Length;
+
+			this.TrailerFieldCount = trailerFieldCount;
 
 			//csv = new CharBuffer(this.CsvFileAbsolutePath, this.Encoding, CharBuffer.MAX_BUFFER_SIZE);
 			csv = new CharBuffer(this.CsvFileAbsolutePath, this.Encoding, CharBuffer.MIN_BUFFER_SIZE * 10);
@@ -349,27 +359,40 @@ namespace CsvReadWrite
 			}
 			else
 			{
-				if (0 == this.rowCount && this.IsColumnCountFromFirstRow)
+				if (this.ColumnCount > 0 && this.fields.Count != this.ColumnCount)
 				{
-					this.ColumnCount = this.fields.Count;
-				}
-				else if (this.ColumnCount > 0 && this.fields.Count != this.ColumnCount)
-				{
-					StringBuilder msg = new StringBuilder();
-					msg.Append("unexpected format => " + this.CsvFileAbsolutePath + " ");
-					msg.Append("expected this.ColumnCount(" + this.ColumnCount + ") ");
-					msg.Append("row(" + (this.rowCount + 1) + ") ");
-					msg.Append("actual this.fields.Count(" + this.fields.Count + ") ");
+                    if (this.TrailerFieldCount > 0 && this.fields.Count == this.TrailerFieldCount) 
+					{ 
+						for(int i =0; i<this.TrailerFieldCount;i++) 
+						{ 
+							this.trailerFields.Add(this.fields[i]);
+						}
+					}
+                    else 
+					{ 
+						StringBuilder msg = new StringBuilder();
+						msg.Append("unexpected format => " + this.CsvFileAbsolutePath + " ");
+						msg.Append("expected this.ColumnCount(" + this.ColumnCount + ") ");
+						msg.Append("row(" + (this.rowCount + 1) + ") ");
+						msg.Append("actual this.fields.Count(" + this.fields.Count + ") ");
 
-					for (int i = 0; i < this.fields.Count; i++)
+						for (int i = 0; i < this.fields.Count; i++)
+						{
+							msg.Append("{Field[" + i + "](" + this.fields[i] + ")} ");
+						}
+
+						throw new CsvUnexpectedFormatException(msg.ToString());
+					}
+				}
+                else 
+				{ 
+					if (0 == this.rowCount && this.IsColumnCountFromFirstRow)
 					{
-						msg.Append("{Field[" + i + "](" + this.fields[i] + ")} ");
+						this.ColumnCount = this.fields.Count;
 					}
 
-					throw new CsvUnexpectedFormatException(msg.ToString());
+					this.rowCount++;
 				}
-
-				this.rowCount++;
 			}
 
 			return true;
