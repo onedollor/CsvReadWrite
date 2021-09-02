@@ -15,7 +15,7 @@
 
 ## Reading a CSV file
 ```c#
-using(IO.CsvStreamReader csv = new IO.CsvStreamReader(csvFileAbsPath, ColumnDelimiter, RowDelimiter, TextQualifier, Encoding, RowDelimiterAcceptAllLineChange_rn_r_n, ColumnCountFromFirstRow, 0))
+using(IO.CsvStreamReader csv = new IO.CsvStreamReader(csvFileAbsPath, Encoding, ColumnDelimiter, RowDelimiter, TextQualifier, RowDelimiterAcceptAllLineChange_rn_r_n, ColumnCountFromFirstRow, TrailerFieldsCount))
 {
     csv.TrimFields = True;
     //if(!ColumnCountFromFirstRow) csv.ColumnCount = {n};

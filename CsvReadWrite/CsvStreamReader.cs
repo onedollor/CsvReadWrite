@@ -54,7 +54,7 @@ namespace CsvReadWrite
 			get { return this.trailerFields; }
 		}
 
-		public CsvStreamReader(string csvFileAbsolutePath, string columnDelimiter, string rowDelimiter, string qualifier, string encoding, bool isRowDelimiterAcceptDifferentLineChangeCharacter, bool isColumnCountFromFirstRow, int trailerFieldCount)
+		public CsvStreamReader(string csvFileAbsolutePath, string encoding, string columnDelimiter=",", string rowDelimiter = "\r\n", string qualifier = "\"", bool isRowDelimiterAcceptDifferentLineChangeCharacter = true, bool isColumnCountFromFirstRow = true, int trailerFieldCount = 0)
 		{
 			CsvFileAbsolutePath = csvFileAbsolutePath;
 			if ((CsvFileAbsolutePath ?? "").Length == 0)
