@@ -13,7 +13,9 @@
 * RowDelimiterAcceptAllLineChange_rn_r_n => flag for turn on auto fit line change in row delimiter
 * ColumnCountFromFirstRow => retrive column count from first row, if set to false please provide expected column count.
 
-## Reading a CSV file
+* trailerFieldCount , set to 0 for no trailer.
+
+## Write\Read a CSV file
 ```c#
 
         static void Main(string[] args)
