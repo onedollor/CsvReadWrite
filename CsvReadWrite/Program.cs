@@ -51,6 +51,9 @@ namespace CsvReader
                          Console.WriteLine();
                 }
 
+
+                Console.WriteLine("-------------------------------------trailer------------------------------------");
+
                 List<string> trailer = csvr.TrailerFields;
                 foreach(string s in trailer) 
                 { 
