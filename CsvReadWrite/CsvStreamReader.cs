@@ -367,6 +367,8 @@ namespace CsvReadWrite
 						{ 
 							this.trailerFields.Add(this.fields[i]);
 						}
+
+						return false;
 					}
                     else 
 					{ 

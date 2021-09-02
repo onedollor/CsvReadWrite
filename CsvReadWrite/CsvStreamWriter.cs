@@ -18,7 +18,11 @@ namespace CsvReadWrite
 		private TextWriter csv = null;
 
 		public int FieldCount { get; private set; }
-		public CsvStreamWriter(string csvFileAbsolutePath, string columnDelimiter, string rowDelimiter, string qualifier, string encoding, int fieldCount)
+		public int TrailerFieldCount { get; private set; }
+		public bool IsFullQualify{ get; private set; }
+		public bool IsTrim{ get; private set; }
+
+		public CsvStreamWriter(string csvFileAbsolutePath, string encoding, int fieldCount, int trailerFieldCount, string columnDelimiter=",", string rowDelimiter="\r\n", string qualifier="\"", bool isFullQualify=false, bool isTrim=true)
 		{
 			CsvFileAbsolutePath = csvFileAbsolutePath;
 			if ((CsvFileAbsolutePath ?? "").Length == 0)
@@ -68,17 +72,21 @@ namespace CsvReadWrite
 			Encoding = (encoding ?? "UTF-8");
 			
 			this.FieldCount = fieldCount;
+			this.TrailerFieldCount = trailerFieldCount;
+			this.IsFullQualify = isFullQualify;
+			this.IsTrim = isTrim;
 
 			csv = new StreamWriter(csvFileAbsolutePath,false, System.Text.Encoding.GetEncoding(this.Encoding));
 		}
 
-		public void write(string[] fields, bool isFullQualify, bool istrim)
-		{
-			for(int i = 0; i< this.FieldCount; i++) 
+		private void write_row(int field_count, string[] fields) 
+		{ 
+			for(int i = 0; i< field_count; i++) 
 			{
 				string v = fields[i];
+				bool isAddQualify = (this.IsFullQualify || (v ?? "").IndexOf(this.strQualifier)>=0 || (v ?? "").IndexOf(this.strColumnDelimiter)>=0 || (v ?? "").IndexOf(this.strRowDelimiter)>=0 || (v ?? "").IndexOf("\r")>=0 || (v ?? "").IndexOf("\n") >= 0);
 
-				if (isFullQualify || (v ?? "").IndexOf(this.strColumnDelimiter)>=0 || (v ?? "").IndexOf(this.strRowDelimiter)>=0 || (v ?? "").IndexOf("\r")>=0 || (v ?? "").IndexOf("\n") >= 0)
+				if (isAddQualify)
 				{
 					csv.Write(this.strQualifier);
 				}
@@ -88,20 +96,25 @@ namespace CsvReadWrite
 					v = v.Replace(this.strQualifier, this.strQualifier + this.strQualifier);
 				}
 
-				csv.Write(istrim ? (v ?? "").Trim() : v);
+				csv.Write(this.IsTrim ? (v ?? "").Trim() : v);
 
-				if (isFullQualify)
+				if (isAddQualify)
 				{
 					csv.Write(this.strQualifier);
 				}
 
-				csv.Write(i < (this.FieldCount - 1)? this.strColumnDelimiter : this.strRowDelimiter);
+				csv.Write(i < (field_count - 1)? this.strColumnDelimiter : this.strRowDelimiter);
 			}
 		}
 
-		public void writeTrailer(string[] fields, bool isFullQualify, bool istrim) 
-		{ 
+		public void write(string[] fields)
+		{
+			this.write_row(this.FieldCount, fields);
+		}
 
+		public void writeTrailer(string[] fields) 
+		{ 
+			this.write_row(this.TrailerFieldCount, fields);
 		}
 
 		public void Dispose()
