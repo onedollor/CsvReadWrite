@@ -1,4 +1,4 @@
-# CsvReadWrite rfc4180 +
+# CsvReadWrite rfc4180+
 ### a simple csv read/write library, support multiple character Row Delimiter and auto fit different line change marks.
 * support multiple character Row Delimiter and auto fit different line change marks.
 * support multiple character Column Delimiter.
