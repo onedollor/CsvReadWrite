@@ -48,6 +48,7 @@ namespace CsvReadWrite
 
 		List<string> fields = new List<string>();
 		List<string> trailerFields = new List<string>();
+		List<string> header = List<string>();
 
 		public List<string> TrailerFields 
 		{ 
@@ -203,11 +204,20 @@ namespace CsvReadWrite
 
 			StringBuilder sbColumnValue = new StringBuilder();
 
+			bool isNullField = true;
+			
 			while (isReadNext)
 			{
 				if (isColumnDelimiterFound || isRowDelimiterFound || csv.Peek() < 0)
 				{
-					this.fields.Add(this.TrimFields ? sbColumnValue.ToString().Trim() : sbColumnValue.ToString());
+					if(isNullField && sbColumnValue.ToString().Length == 0)
+					{
+						this.fields.Add(null);
+					}
+					else
+					{
+						this.fields.Add(this.TrimFields ? sbColumnValue.ToString().Trim() : sbColumnValue.ToString());
+					}
 
 					isColumnDelimiterFound = false;
 
@@ -218,6 +228,7 @@ namespace CsvReadWrite
 					else
 					{
 						sbColumnValue = new StringBuilder();
+						isNullField = true;
 					}
 				}
 				else
@@ -227,6 +238,8 @@ namespace CsvReadWrite
 					if (this.strQualifier == peekQualifier)
 					{
 						bool isQualifierFound = false;
+						isNullField = false;
+						
 						csv.Read(this.Qualifier.Length);
 
 						while (!isQualifierFound && csv.Peek() >= 0)
