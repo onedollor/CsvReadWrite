@@ -48,7 +48,7 @@ namespace CsvReadWrite
 
 		List<string> fields = new List<string>();
 		List<string> trailerFields = new List<string>();
-		List<string> header = List<string>();
+		List<string> header = new List<string>();
 
 		public List<string> TrailerFields 
 		{ 
