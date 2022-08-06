@@ -23,6 +23,7 @@ namespace CsvReadWrite
 		public string Encoding { get; private set; }
 		public long CsvLength { get; private set; }
 		private bool IsColumnCountFromFirstRow { get; set; }
+		private bool IsEscapeQualifer { get; set; }
 		public string CsvFileAbsolutePath { get; private set; }
 		public Int64 RowCount
 		{
@@ -55,7 +56,7 @@ namespace CsvReadWrite
 			get { return this.trailerFields; }
 		}
 
-		public CsvStreamReader(string csvFileAbsolutePath, string encoding, string columnDelimiter=",", string rowDelimiter = "\r\n", string qualifier = "\"", bool isRowDelimiterAcceptDifferentLineChangeCharacter = true, bool isColumnCountFromFirstRow = true, int trailerFieldCount = 0)
+		public CsvStreamReader(string csvFileAbsolutePath, string encoding, string columnDelimiter=",", string rowDelimiter = "\r\n", string qualifier = "\"", bool isRowDelimiterAcceptDifferentLineChangeCharacter = true, bool isColumnCountFromFirstRow = true, bool isEscapeQualifer = false, int trailerFieldCount = 0)
 		{
 			CsvFileAbsolutePath = csvFileAbsolutePath;
 			if ((CsvFileAbsolutePath ?? "").Length == 0)
@@ -105,7 +106,8 @@ namespace CsvReadWrite
 				throw new ArgumentException("Row Delimiter cannot be empty.");
 
 			IsColumnCountFromFirstRow = isColumnCountFromFirstRow;
-
+			IsEscapeQualifer = isEscapeQualifer;
+			
 			if ("" == (qualifier ?? ""))
 			{
 				strQualifier = "\"";
@@ -244,49 +246,98 @@ namespace CsvReadWrite
 
 						while (!isQualifierFound && csv.Peek() >= 0)
 						{
-							if (new string(csv.Peek(this.Qualifier.Length * 2)) == (this.strQualifier + this.strQualifier))
+							if(!this.IsEscapeQualifer)
 							{
-								sbColumnValue.Append(csv.Read(this.Qualifier.Length));
-								csv.Read();
-							}
-							else if (new string(csv.Peek(this.Qualifier.Length + this.RowDelimiter.Length)) == (this.strQualifier + this.strRowDelimiter))
-							{
-								isQualifierFound = true;
-								isRowDelimiterFound = true;
-								csv.Read(this.Qualifier.Length);
-								csv.Read(this.RowDelimiter.Length);
-							}
-							else if (this.IsRowDelimiterAcceptDifferentLineChangeCharacter && new string(csv.Peek(this.Qualifier.Length + this.strRowDelimiter_rn.Length)) == (this.strQualifier + this.strRowDelimiter_rn))
-							{
-								isQualifierFound = true;
-								isRowDelimiterFound = true;
-								csv.Read(this.Qualifier.Length);
-								csv.Read(this.strRowDelimiter_rn.Length);
-							}
-							else if (this.IsRowDelimiterAcceptDifferentLineChangeCharacter && new string(csv.Peek(this.Qualifier.Length + this.strRowDelimiter_r.Length)) == (this.strQualifier + this.strRowDelimiter_r))
-							{
-								isQualifierFound = true;
-								isRowDelimiterFound = true;
-								csv.Read(this.Qualifier.Length);
-								csv.Read(this.strRowDelimiter_r.Length);
-							}
-							else if (this.IsRowDelimiterAcceptDifferentLineChangeCharacter && new string(csv.Peek(this.Qualifier.Length + this.strRowDelimiter_n.Length)) == (this.strQualifier + this.strRowDelimiter_n))
-							{
-								isQualifierFound = true;
-								isRowDelimiterFound = true;
-								csv.Read(this.Qualifier.Length);
-								csv.Read(this.strRowDelimiter_n.Length);
-							}
-							else if (new string(csv.Peek(this.Qualifier.Length + this.ColumnDelimiter.Length)) == (this.strQualifier + this.strColumnDelimiter))
-							{
-								isQualifierFound = true;
-								isColumnDelimiterFound = true;
-								csv.Read(this.Qualifier.Length);
-								csv.Read(this.ColumnDelimiter.Length);
+								if (new string(csv.Peek(this.Qualifier.Length + this.RowDelimiter.Length)) == (this.strQualifier + this.strRowDelimiter))
+								{
+									isQualifierFound = true;
+									isRowDelimiterFound = true;
+									csv.Read(this.Qualifier.Length);
+									csv.Read(this.RowDelimiter.Length);
+								}
+								else if (this.IsRowDelimiterAcceptDifferentLineChangeCharacter && new string(csv.Peek(this.Qualifier.Length + this.strRowDelimiter_rn.Length)) == (this.strQualifier + this.strRowDelimiter_rn))
+								{
+									isQualifierFound = true;
+									isRowDelimiterFound = true;
+									csv.Read(this.Qualifier.Length);
+									csv.Read(this.strRowDelimiter_rn.Length);
+								}
+								else if (this.IsRowDelimiterAcceptDifferentLineChangeCharacter && new string(csv.Peek(this.Qualifier.Length + this.strRowDelimiter_r.Length)) == (this.strQualifier + this.strRowDelimiter_r))
+								{
+									isQualifierFound = true;
+									isRowDelimiterFound = true;
+									csv.Read(this.Qualifier.Length);
+									csv.Read(this.strRowDelimiter_r.Length);
+								}
+								else if (this.IsRowDelimiterAcceptDifferentLineChangeCharacter && new string(csv.Peek(this.Qualifier.Length + this.strRowDelimiter_n.Length)) == (this.strQualifier + this.strRowDelimiter_n))
+								{
+									isQualifierFound = true;
+									isRowDelimiterFound = true;
+									csv.Read(this.Qualifier.Length);
+									csv.Read(this.strRowDelimiter_n.Length);
+								}
+								else if (new string(csv.Peek(this.Qualifier.Length + this.ColumnDelimiter.Length)) == (this.strQualifier + this.strColumnDelimiter))
+								{
+									isQualifierFound = true;
+									isColumnDelimiterFound = true;
+									csv.Read(this.Qualifier.Length);
+									csv.Read(this.ColumnDelimiter.Length);
+								}
+								else if (new string(csv.Peek(this.Qualifier.Length)) == this.strQualifier)
+								{
+									sbColumnValue.Append(csv.Read(this.Qualifier.Length));
+								}
+								else
+								{
+									sbColumnValue.Append((char)csv.Read());
+								}
 							}
 							else
 							{
-								sbColumnValue.Append((char)csv.Read());
+								if (new string(csv.Peek(this.Qualifier.Length * 2)) == (this.strQualifier + this.strQualifier))
+								{
+									sbColumnValue.Append(csv.Read(this.Qualifier.Length));
+									csv.Read(this.Qualifier.Length);
+								}
+								else if (new string(csv.Peek(this.Qualifier.Length + this.RowDelimiter.Length)) == (this.strQualifier + this.strRowDelimiter))
+								{
+									isQualifierFound = true;
+									isRowDelimiterFound = true;
+									csv.Read(this.Qualifier.Length);
+									csv.Read(this.RowDelimiter.Length);
+								}
+								else if (this.IsRowDelimiterAcceptDifferentLineChangeCharacter && new string(csv.Peek(this.Qualifier.Length + this.strRowDelimiter_rn.Length)) == (this.strQualifier + this.strRowDelimiter_rn))
+								{
+									isQualifierFound = true;
+									isRowDelimiterFound = true;
+									csv.Read(this.Qualifier.Length);
+									csv.Read(this.strRowDelimiter_rn.Length);
+								}
+								else if (this.IsRowDelimiterAcceptDifferentLineChangeCharacter && new string(csv.Peek(this.Qualifier.Length + this.strRowDelimiter_r.Length)) == (this.strQualifier + this.strRowDelimiter_r))
+								{
+									isQualifierFound = true;
+									isRowDelimiterFound = true;
+									csv.Read(this.Qualifier.Length);
+									csv.Read(this.strRowDelimiter_r.Length);
+								}
+								else if (this.IsRowDelimiterAcceptDifferentLineChangeCharacter && new string(csv.Peek(this.Qualifier.Length + this.strRowDelimiter_n.Length)) == (this.strQualifier + this.strRowDelimiter_n))
+								{
+									isQualifierFound = true;
+									isRowDelimiterFound = true;
+									csv.Read(this.Qualifier.Length);
+									csv.Read(this.strRowDelimiter_n.Length);
+								}
+								else if (new string(csv.Peek(this.Qualifier.Length + this.ColumnDelimiter.Length)) == (this.strQualifier + this.strColumnDelimiter))
+								{
+									isQualifierFound = true;
+									isColumnDelimiterFound = true;
+									csv.Read(this.Qualifier.Length);
+									csv.Read(this.ColumnDelimiter.Length);
+								}
+								else
+								{
+									sbColumnValue.Append((char)csv.Read());
+								}								
 							}
 						}
 					}

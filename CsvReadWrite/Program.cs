@@ -36,8 +36,9 @@ namespace CsvReader
 
             bool rowDelimiterAcceptAllLineChange_rn_r_n = true;
             bool columnCountFromFirstRow = true;
+			bool isEscapeQualifer = false;
 
-            using(CsvStreamReader csvr = new CsvStreamReader(csvFileAbsPath, encoding, columnDelimiter, rowDelimiter, qualifier, rowDelimiterAcceptAllLineChange_rn_r_n, columnCountFromFirstRow, trailerFieldCount))
+            using(CsvStreamReader csvr = new CsvStreamReader(csvFileAbsPath, encoding, columnDelimiter, rowDelimiter, qualifier, rowDelimiterAcceptAllLineChange_rn_r_n, columnCountFromFirstRow, isEscapeQualifer, trailerFieldCount))
             {
                 csvr.TrimFields = true;
                 //if(!ColumnCountFromFirstRow) csv.ColumnCount = {n};
