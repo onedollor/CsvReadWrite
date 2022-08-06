@@ -45,7 +45,7 @@ static void Main(string[] args)
 
     bool rowDelimiterAcceptAllLineChange_rn_r_n = true;
     bool columnCountFromFirstRow = true;
-    bool isEscapeQualifer = false;
+    bool isEscapeQualifer = true;
     
     using(CsvStreamReader csvr = 
     new CsvStreamReader(csvFileAbsPath, encoding, columnDelimiter, rowDelimiter, qualifier, rowDelimiterAcceptAllLineChange_rn_r_n, 
