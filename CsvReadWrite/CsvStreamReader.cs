@@ -56,7 +56,7 @@ namespace CsvReadWrite
 			get { return this.trailerFields; }
 		}
 
-		public CsvStreamReader(string csvFileAbsolutePath, string encoding, string columnDelimiter=",", string rowDelimiter = "\r\n", string qualifier = "\"", bool isRowDelimiterAcceptDifferentLineChangeCharacter = true, bool isColumnCountFromFirstRow = true, bool isEscapeQualifer = false, int trailerFieldCount = 0)
+		public CsvStreamReader(string csvFileAbsolutePath, string encoding, string columnDelimiter=",", string rowDelimiter = "\r\n", string qualifier = "\"", bool isRowDelimiterAcceptDifferentLineChangeCharacter = true, bool isColumnCountFromFirstRow = true, bool isEscapeQualifer = true, int trailerFieldCount = 0)
 		{
 			CsvFileAbsolutePath = csvFileAbsolutePath;
 			if ((CsvFileAbsolutePath ?? "").Length == 0)
@@ -246,7 +246,7 @@ namespace CsvReadWrite
 
 						while (!isQualifierFound && csv.Peek() >= 0)
 						{
-							if(this.IsEscapeQualifer)
+							if(!this.IsEscapeQualifer)
 							{
 								if (new string(csv.Peek(this.Qualifier.Length + this.RowDelimiter.Length)) == (this.strQualifier + this.strRowDelimiter))
 								{
