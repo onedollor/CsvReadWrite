@@ -246,7 +246,7 @@ namespace CsvReadWrite
 
 						while (!isQualifierFound && csv.Peek() >= 0)
 						{
-							if(!this.IsEscapeQualifer)
+							if(this.IsEscapeQualifer)
 							{
 								if (new string(csv.Peek(this.Qualifier.Length + this.RowDelimiter.Length)) == (this.strQualifier + this.strRowDelimiter))
 								{
